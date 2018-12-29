@@ -24,6 +24,7 @@ Setting bot up
         bot should now be running!
 
 Config.json
+
     token - put here your Discord bot token. You can get it from here: https://discordapp.com/developers
 
     prefix - put here your preferred prefix (I prefer "-")
@@ -35,6 +36,7 @@ Config.json
     roastMessage - message displayed with roast command
 
 Commands:
+
     play - used to add song to queue Ex. "-play https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
     skip - used to skip currently playing song
