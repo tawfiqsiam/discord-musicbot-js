@@ -33,7 +33,7 @@ Config.json
 
     volume - put here your preferred bot volume (I prefer "0.5")
 
-    roastMessage - message displayed with roast command
+    roast - message displayed with roast command
 
 Commands:
 
