@@ -17,7 +17,7 @@ Setting bot up
             npm i discord.js --save
             npm i ytdl-core --save
             npm i ffmpeg-binaries --save
-            npm i opusscript --save
+            npm i node-opus --save
         edit config.json to your needs
         run following command in terminal:
             node index.js

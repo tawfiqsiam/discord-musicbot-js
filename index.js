@@ -129,7 +129,7 @@ function playerChecks(message) {
     // Will verify we can play some music
     if(!message.member.voiceChannel) {
         message.channel.send("You must be in a voice channel");
-        return;
+        return false;
     }   
 
     // Lets setup player for our server if there is not one
@@ -138,6 +138,7 @@ function playerChecks(message) {
         paused: false,
         volume: VOLUME
     };
+    return true;
 }
 
 if (RADIO != "" && RADIONAME != "") {
@@ -170,7 +171,8 @@ function botSetup() {
                     message.channel.send("Arguments missing!");
                     return;
                 }
-                playerChecks(message);
+                var ready = playerChecks(message);
+                if (!ready) return;
                 // Lets queue a song if it is recognized as youtube link
                 if (ytdl.validateURL(args[1])) {
                     servers[message.guild.id].queue.push(args[1]);
@@ -298,7 +300,8 @@ function botSetup() {
                     message.channel.send("Invalid command");
                     return;
                 }
-                playerChecks(message);
+                var ready = playerChecks(message);
+                if (!ready) return;
                 servers[message.guild.id].queue.push(RADIO);
                 message.reply(RADIONAME + " queued!");
                 // Make the bot join users voice channel and play first song of queue
