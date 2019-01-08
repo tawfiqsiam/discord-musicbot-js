@@ -35,7 +35,7 @@ Config.json
 
     roast - message displayed with roast command
 
-    radio - URL you want to stream for (This can be radio station for example)
+    radio - URL you want to stream from (This can be radio station for example)
 
     radioname - Will be the name for radio you have chosen. Radio will be queued with (prefix+radioname, ex. "-Metro95.1"). Don't use spaces in radioname!!
 
