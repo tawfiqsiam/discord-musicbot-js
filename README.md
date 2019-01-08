@@ -35,6 +35,10 @@ Config.json
 
     roast - message displayed with roast command
 
+    radio - URL you want to stream for (This can be radio station for example)
+
+    radioname - Will be the name for radio you have chosen. Radio will be queued with (prefix+radioname, ex. "-Metro95.1"). Don't use spaces in radioname!!
+
 Commands:
 
     play - used to add song to queue Ex. "-play https://www.youtube.com/watch?v=dQw4w9WgXcQ"
@@ -56,5 +60,7 @@ Commands:
     resume - used to resume bot
 
     help - used to display all the commands
+
+    radioname - if you have set up radio you can play it with this command NOTE: radioname is what you have set up in config!
 
 # discord-musicbot-js

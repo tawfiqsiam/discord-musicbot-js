@@ -20,11 +20,18 @@ const VOLUME = config.volume;
 
 const roastMessage = config.roast;
 
+const RADIO = config.radio;
+
+const RADIONAME = config.radioName;
+
+var radiostatus;
+
 
 /* TODO:
 		soundcloud support
         shuffle command
         playlist support
+        support multiple radio stations
 */
 
 function play(connection, message) { 
@@ -40,6 +47,9 @@ function play(connection, message) {
             bot.user.setActivity(info.title);
         });
 
+    } else if (server.queue[0] == RADIO) {
+        server.dispatcher = connection.playStream(RADIO);
+        bot.user.setActivity(RADIONAME);
     }
 
     // Make sure we have correct volume for current server and update song queue
@@ -109,9 +119,31 @@ function queueReply(message) {
     for (var i = 0; i < server.queue.length; i++) {
         ytdl.getBasicInfo(server.queue[i], function(err,info) {
             if (info != null) message.channel.send("  " + info.title);
+            else if (server.queue[i] == RADIO) message.channel.send(RADIONAME);
             else message.channel.send("CORRUPT SONG AT INDEX: " + i + " (probably a playlist?)");
         });
     }
+}
+
+function playerChecks(message) {
+    // Will verify we can play some music
+    if(!message.member.voiceChannel) {
+        message.channel.send("You must be in a voice channel");
+        return;
+    }   
+
+    // Lets setup player for our server if there is not one
+    if (!servers[message.guild.id]) servers[message.guild.id] = {
+        queue: [],
+        paused: false,
+        volume: VOLUME
+    };
+}
+
+if (RADIO != "" && RADIONAME != "") {
+    radiostatus = true;
+} else {
+    radiostatus = false;
 }
 
 var bot = new Discord.Client();
@@ -138,19 +170,7 @@ function botSetup() {
                     message.channel.send("Arguments missing!");
                     return;
                 }
-
-                if(!message.member.voiceChannel) {
-                    message.channel.send("You must be in a voice channel");
-                    return;
-                }   
-
-                // Lets setup player for our server if there is not one
-                if (!servers[message.guild.id]) servers[message.guild.id] = {
-                    queue: [],
-                    paused: false,
-                    volume: VOLUME
-                };
-
+                playerChecks(message);
                 // Lets queue a song if it is recognized as youtube link
                 if (ytdl.validateURL(args[1])) {
                     servers[message.guild.id].queue.push(args[1]);
@@ -167,6 +187,10 @@ function botSetup() {
                 break;
 
             case "skip":
+                if (!servers[message.guild.id]) {
+                    message.channel.send("Queue something first.");
+                    return;
+                };
                 var server = servers[message.guild.id];
 
                 // If something is currently playing we will skip it
@@ -179,8 +203,9 @@ function botSetup() {
                 break;
 
             case "stop":
+                if (!servers[message.guild.id]) return;
                 var server = servers[message.guild.id];
-
+                
                 bot.user.setActivity(STATUS);
                 server.queue = [];
                 server.paused = false;
@@ -188,6 +213,10 @@ function botSetup() {
                 break;
 
             case "volume":
+                if (!servers[message.guild.id]) {
+                    message.channel.send("Queue something first.");
+                    return;
+                };
                 var server = servers[message.guild.id];
 
                 // Reply with volume if value is not given else we will try to set volume to match value
@@ -221,12 +250,20 @@ function botSetup() {
 
             case "queue":
             case "q":
+                if (!servers[message.guild.id]) {
+                    message.channel.send("Queue something first.");
+                    return;
+                }
                 queueReply(message);
                 break;
 
             case "pause":
             case "p":
                 // Will pause player
+                if (!servers[message.guild.id]) {
+                    message.channel.send("Queue something first.");
+                    return;
+                };
                 var player = servers[message.guild.id].dispatcher;
 
                 if (player && !servers[message.guild.id].paused) {
@@ -241,6 +278,10 @@ function botSetup() {
             case "resume":
             case "r":
                 // Will resume player
+                if (!servers[message.guild.id]) {
+                    message.channel.send("Queue something first.");
+                    return;
+                };
                 var server = servers[message.guild.id];
 
                 if(server.paused) {
@@ -252,9 +293,27 @@ function botSetup() {
                 }
                 break;
 
+            case RADIONAME.toLowerCase():
+                if (!radiostatus) {
+                    message.channel.send("Invalid command");
+                    return;
+                }
+                playerChecks(message);
+                servers[message.guild.id].queue.push(RADIO);
+                message.reply(RADIONAME + " queued!");
+                // Make the bot join users voice channel and play first song of queue
+                if (!message.guild.voiceConnection) message.member.voiceChannel.join().then(function(connection) {
+                    play(connection, message);
+                });
+                break;
+
             case "help":
                 // TODO: Make this message more user friendly
-                message.reply("reset, restart, roast, help, play, stop, volume, skip, q(ueue), p(ause), r(esume)");
+                if (radiostatus) {
+                    message.reply("reset, restart, roast, help, play, stop, volume, skip, q(ueue), p(ause), r(esume), " + RADIONAME.toLowerCase());
+                } else {
+                    message.reply("reset, restart, roast, help, play, stop, volume, skip, q(ueue), p(ause), r(esume)");
+                }
                 break;
 
             default:

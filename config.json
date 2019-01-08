@@ -1,7 +1,9 @@
 {
-    "token": "YOUR TOKEN HERE",
-    "prefix": "-",
+    "token": "",
+    "prefix": "+",
     "status": "Ready to play music!",
     "volume": 0.5,
-    "roast": ""
+    "roast": "",
+    "radio": "",
+    "radioName": ""
 }
