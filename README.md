@@ -12,15 +12,9 @@ Setting bot up
         NOTE: You need to have python set up as environmental variable!
     
     Linux:
-        open terminal to project folder
-        run following commands:
-            npm i discord.js --save
-            npm i ytdl-core --save
-            npm i ffmpeg-binaries --save
-            npm i node-opus --save
+        execute install-presequites.sh
         edit config.json to your needs
-        run following command in terminal:
-            node index.js
+        execute startbot.sh
         bot should now be running!
 
 Config.json

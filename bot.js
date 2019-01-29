@@ -10,6 +10,8 @@ const ytdl = require('ytdl-core');
 
 const config = require('./config.json');
 
+const fs  = require('fs');
+
 const TOKEN = config.token;
 
 const PREFIX = config.prefix;
@@ -28,10 +30,11 @@ var radiostatus;
 
 
 /* TODO:
-		soundcloud support
+        soundcloud support
         shuffle command
         playlist support
-        support multiple radio stations
+        optimize queue text
+        read callbacks
 */
 
 function play(connection, message) { 
@@ -48,7 +51,7 @@ function play(connection, message) {
         });
 
     } else if (server.queue[0] == RADIO) {
-        server.dispatcher = connection.playStream(RADIO);
+        server.dispatcher = connection.playFile(RADIO);
         bot.user.setActivity(RADIONAME);
     }
 
@@ -62,8 +65,8 @@ function play(connection, message) {
         else {
             server.dispatcher = false;
             server.paused = false;
-        	message.guild.voiceConnection.disconnect();
-        	bot.user.setActivity(STATUS);
+            message.guild.voiceConnection.disconnect();
+            bot.user.setActivity(STATUS);
         }
     });
 }
@@ -73,11 +76,11 @@ function resetBot(message) {
         Function that will be used if user wants to
         completely reset the bot for some reason.
     */
-	message.channel.send("Resetting BOT!")
+    message.channel.send("Resetting BOT!")
     .then(() => bot.destroy())
     .then(() => servers = {})
     .then(() => bot = new Discord.Client())
-	.then(() => botSetup());
+    .then(() => botSetup());
 }
 
 function songQueued(message, link, youtube) {
@@ -157,8 +160,8 @@ function botSetup() {
         our so called "commandhandler".
     */
     bot.on("ready", () => bot.user.setActivity(STATUS));
-    bot.on("message", function(message) {
-
+    bot.on("error", (e) => console.log(e));
+    bot.on("message", function(message) {    
         if (message.author.equals(bot.user)) return;
         if (!message.content.startsWith(PREFIX)) return;
 
@@ -227,7 +230,6 @@ function botSetup() {
                 } else {
                     try {
                         var want_vol = Number(args[1]);
-
                         if (want_vol <= 1 && want_vol > 0) {
                             server.volume = want_vol;
                             servers[message.guild.id].dispatcher.setVolume(server.volume);
